@@ -24,7 +24,7 @@ export async function emailOrderHistory(
       email: true,
       orders: {
         select: {
-          pricePaidInCents: true,
+          pricePaidInPiasters: true,
           id: true,
           createdAt: true,
           product: {
@@ -47,7 +47,7 @@ export async function emailOrderHistory(
     }
   }
 
-  const orders = user.orders.map(async order => {
+  const orders = user.orders.map(async (order: any) => {
     return {
       ...order,
       downloadVerificationId: (
