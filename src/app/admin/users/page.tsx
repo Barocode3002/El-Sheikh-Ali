@@ -22,7 +22,7 @@ function getUsers() {
     select: {
       id: true,
       email: true,
-      orders: { select: { pricePaidInCents: true } },
+      orders: { select: { pricePaidInPiasters: true } },
     },
     orderBy: { createdAt: "desc" },
   })
@@ -61,7 +61,7 @@ async function UsersTable() {
             <TableCell>{formatNumber(user.orders.length)}</TableCell>
             <TableCell>
               {formatCurrency(
-                user.orders.reduce((sum, o) => o.pricePaidInCents + sum, 0) /
+                user.orders.reduce((sum, o) => o.pricePaidInPiasters + sum, 0) /
                   100
               )}
             </TableCell>

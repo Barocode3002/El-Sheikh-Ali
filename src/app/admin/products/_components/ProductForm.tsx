@@ -16,8 +16,8 @@ export function ProductForm({ product }: { product?: Product | null }) {
     product == null ? addProduct : updateProduct.bind(null, product.id),
     {}
   )
-  const [priceInCents, setPriceInCents] = useState<number | undefined>(
-    product?.priceInCents
+  const [priceInPiasters, setPriceInPiasters] = useState<number | undefined>(
+    product?.priceInPiasters
   )
 
   return (
@@ -34,20 +34,20 @@ export function ProductForm({ product }: { product?: Product | null }) {
         {error.name && <div className="text-destructive">{error.name}</div>}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="priceInCents">Price In Cents</Label>
+        <Label htmlFor="priceInPiasters">Price In Piasters</Label>
         <Input
           type="number"
-          id="priceInCents"
-          name="priceInCents"
+          id="priceInPiasters"
+          name="priceInPiasters"
           required
-          value={priceInCents}
-          onChange={e => setPriceInCents(Number(e.target.value) || undefined)}
+          value={priceInPiasters}
+          onChange={e => setPriceInPiasters(Number(e.target.value) || undefined)}
         />
         <div className="text-muted-foreground">
-          {formatCurrency((priceInCents || 0) / 100)}
+          {formatCurrency((priceInPiasters || 0) / 100)}
         </div>
-        {error.priceInCents && (
-          <div className="text-destructive">{error.priceInCents}</div>
+        {error.priceInPiasters && (
+          <div className="text-destructive">{error.priceInPiasters}</div>
         )}
       </div>
       <div className="space-y-2">
@@ -60,6 +60,23 @@ export function ProductForm({ product }: { product?: Product | null }) {
         />
         {error.description && (
           <div className="text-destructive">{error.description}</div>
+        )}
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="stockQuantity">Stock Quantity</Label>
+        <Input
+          type="number"
+          id="stockQuantity"
+          name="stockQuantity"
+          required
+          min="0"
+          defaultValue={product?.stockQuantity ?? 0}
+        />
+        <div className="text-muted-foreground text-sm">
+          Number of items available in stock
+        </div>
+        {error.stockQuantity && (
+          <div className="text-destructive">{error.stockQuantity}</div>
         )}
       </div>
       <div className="space-y-2">

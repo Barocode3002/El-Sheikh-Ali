@@ -6,7 +6,7 @@ import { Resend } from "resend"
 import { z } from "zod"
 
 const emailSchema = z.string().email()
-const resend = new Resend(process.env.RESEND_API_KEY as string)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function emailOrderHistory(
   prevState: unknown,
@@ -61,15 +61,19 @@ export async function emailOrderHistory(
     }
   })
 
-  const data = await resend.emails.send({
-    from: `Support <${process.env.SENDER_EMAIL}>`,
-    to: user.email,
-    subject: "Order History",
-    react: <OrderHistoryEmail orders={await Promise.all(orders)} />,
-  })
+  if (resend) {
+    const data = await resend.emails.send({
+      from: `Support <${process.env.SENDER_EMAIL}>`,
+      to: user.email,
+      subject: "Order History",
+      react: <OrderHistoryEmail orders={await Promise.all(orders)} />,
+    })
 
-  if (data.error) {
-    return { error: "There was an error sending your email. Please try again." }
+    if (data.error) {
+      return { error: "There was an error sending your email. Please try again." }
+    }
+  } else {
+    console.warn("RESEND_API_KEY not configured - email not sent")
   }
 
   return {

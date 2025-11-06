@@ -10,15 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { formatCurrency } from "@/lib/formatters"
-import {
-  Elements,
-  LinkAuthenticationElement,
-  PaymentElement,
-  useElements,
-  useStripe,
-} from "@stripe/react-stripe-js"
-import { loadStripe } from "@stripe/stripe-js"
 import Image from "next/image"
 import { FormEvent, useState } from "react"
 
@@ -27,17 +21,13 @@ type CheckoutFormProps = {
     id: string
     imagePath: string
     name: string
-    priceInCents: number
+    priceInPiasters: number
     description: string
+    stockQuantity: number
   }
-  clientSecret: string
 }
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
-)
-
-export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
+export function CheckoutForm({ product }: CheckoutFormProps) {
   return (
     <div className="max-w-5xl w-full mx-auto space-y-8">
       <div className="flex gap-4 items-center">
@@ -51,7 +41,7 @@ export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
         </div>
         <div>
           <div className="text-lg">
-            {formatCurrency(product.priceInCents / 100)}
+            {formatCurrency(product.priceInPiasters / 100)}
           </div>
           <h1 className="text-2xl font-bold">{product.name}</h1>
           <div className="line-clamp-3 text-muted-foreground">
@@ -59,34 +49,62 @@ export function CheckoutForm({ product, clientSecret }: CheckoutFormProps) {
           </div>
         </div>
       </div>
-      <Elements options={{ clientSecret }} stripe={stripePromise}>
-        <Form priceInCents={product.priceInCents} productId={product.id} />
-      </Elements>
+      <Form
+        priceInPiasters={product.priceInPiasters}
+        productId={product.id}
+        stockQuantity={product.stockQuantity}
+      />
     </div>
   )
 }
 
 function Form({
-  priceInCents,
+  priceInPiasters,
   productId,
+  stockQuantity,
 }: {
-  priceInCents: number
+  priceInPiasters: number
   productId: string
+  stockQuantity: number
 }) {
-  const stripe = useStripe()
-  const elements = useElements()
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string>()
-  const [email, setEmail] = useState<string>()
+  const [formData, setFormData] = useState({
+    email: "",
+    customerName: "",
+    phoneNumber: "",
+    address: "",
+    city: "",
+    postalCode: "",
+    notes: ""
+  })
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
 
-    if (stripe == null || elements == null || email == null) return
+    // Validate required fields
+    if (!formData.email || !formData.customerName || !formData.phoneNumber || !formData.address || !formData.city) {
+      setErrorMessage("Please fill in all required fields")
+      return
+    }
 
     setIsLoading(true)
 
-    const orderExists = await userOrderExists(email, productId)
+    // Check stock availability
+    if (stockQuantity <= 0) {
+      setErrorMessage("This product is currently out of stock")
+      setIsLoading(false)
+      return
+    }
+
+    const orderExists = await userOrderExists(formData.email, productId)
 
     if (orderExists) {
       setErrorMessage(
@@ -96,28 +114,30 @@ function Form({
       return
     }
 
-    stripe
-      .confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/stripe/purchase-success`,
-        },
-      })
-      .then(({ error }) => {
-        if (error.type === "card_error" || error.type === "validation_error") {
-          setErrorMessage(error.message)
-        } else {
-          setErrorMessage("An unknown error occurred")
-        }
-      })
-      .finally(() => setIsLoading(false))
+    // Redirect to COD success page with all customer info
+    const params = new URLSearchParams({
+      productId,
+      email: formData.email,
+      price: priceInPiasters.toString(),
+      customerName: formData.customerName,
+      phoneNumber: formData.phoneNumber,
+      address: formData.address,
+      city: formData.city,
+      postalCode: formData.postalCode,
+      notes: formData.notes
+    })
+
+    window.location.href = `/cod/purchase-success?${params.toString()}`
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <Card>
         <CardHeader>
-          <CardTitle>Checkout</CardTitle>
+          <CardTitle>Cash on Delivery Checkout</CardTitle>
+          <CardDescription>
+            You will pay when you receive your order
+          </CardDescription>
           {errorMessage && (
             <CardDescription className="text-destructive">
               {errorMessage}
@@ -125,10 +145,92 @@ function Form({
           )}
         </CardHeader>
         <CardContent>
-          <PaymentElement />
-          <div className="mt-4">
-            <LinkAuthenticationElement
-              onChange={e => setEmail(e.value.email)}
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              type="email"
+              id="email"
+              name="email"
+              required
+              value={formData.email}
+              onChange={handleInputChange}
+              placeholder="Enter your email address"
+            />
+            <p className="text-sm text-muted-foreground">
+              We&apos;ll send your order confirmation to this email
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="customerName">Full Name</Label>
+            <Input
+              type="text"
+              id="customerName"
+              name="customerName"
+              required
+              value={formData.customerName}
+              onChange={handleInputChange}
+              placeholder="Enter your full name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phoneNumber">Phone Number</Label>
+            <Input
+              type="tel"
+              id="phoneNumber"
+              name="phoneNumber"
+              required
+              value={formData.phoneNumber}
+              onChange={handleInputChange}
+              placeholder="Enter your phone number"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="address">Delivery Address</Label>
+            <Input
+              type="text"
+              id="address"
+              name="address"
+              required
+              value={formData.address}
+              onChange={handleInputChange}
+              placeholder="Street address"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="city">City</Label>
+              <Input
+                type="text"
+                id="city"
+                name="city"
+                required
+                value={formData.city}
+                onChange={handleInputChange}
+                placeholder="City"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="postalCode">Postal Code</Label>
+              <Input
+                type="text"
+                id="postalCode"
+                name="postalCode"
+                value={formData.postalCode}
+                onChange={handleInputChange}
+                placeholder="Postal code"
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="notes">Order Notes (Optional)</Label>
+            <textarea
+              id="notes"
+              name="notes"
+              value={formData.notes}
+              onChange={handleInputChange}
+              placeholder="Any special instructions for your order"
+              className="w-full p-2 border rounded-md"
+              rows={3}
             />
           </div>
         </CardContent>
@@ -136,11 +238,12 @@ function Form({
           <Button
             className="w-full"
             size="lg"
-            disabled={stripe == null || elements == null || isLoading}
+            disabled={isLoading}
+            type="submit"
           >
             {isLoading
-              ? "Purchasing..."
-              : `Purchase - ${formatCurrency(priceInCents / 100)}`}
+              ? "Processing..."
+              : `Place Order - ${formatCurrency(priceInPiasters / 100)}`}
           </Button>
         </CardFooter>
       </Card>

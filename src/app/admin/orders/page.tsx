@@ -22,7 +22,7 @@ function getOrders() {
   return db.order.findMany({
     select: {
       id: true,
-      pricePaidInCents: true,
+      pricePaidInPiasters: true,
       product: { select: { name: true } },
       user: { select: { email: true } },
     },
@@ -62,7 +62,7 @@ async function OrdersTable() {
             <TableCell>{order.product.name}</TableCell>
             <TableCell>{order.user.email}</TableCell>
             <TableCell>
-              {formatCurrency(order.pricePaidInCents / 100)}
+              {formatCurrency(order.pricePaidInPiasters / 100)}
             </TableCell>
             <TableCell className="text-center">
               <DropdownMenu>

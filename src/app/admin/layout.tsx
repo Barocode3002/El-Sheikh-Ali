@@ -1,4 +1,4 @@
-import { Nav, NavLink } from "@/components/Nav"
+import { AdminNav } from "@/components/AdminNav"
 
 export const dynamic = "force-dynamic"
 
@@ -8,14 +8,13 @@ export default function AdminLayout({
   children: React.ReactNode
 }>) {
   return (
-    <>
-      <Nav>
-        <NavLink href="/admin">Dashboard</NavLink>
-        <NavLink href="/admin/products">Products</NavLink>
-        <NavLink href="/admin/users">Customers</NavLink>
-        <NavLink href="/admin/orders">Sales</NavLink>
-      </Nav>
-      <div className="container my-6">{children}</div>
-    </>
+    <div className="min-h-screen bg-gradient-to-br from-secondary/20 to-background">
+      <AdminNav />
+      <div className="lg:pl-64">
+        <main className="p-6 lg:p-8">
+          {children}
+        </main>
+      </div>
+    </div>
   )
 }

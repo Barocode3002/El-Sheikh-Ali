@@ -13,13 +13,17 @@ datasource db {
 model Product {
   id                     String                 @id @default(uuid())
   name                   String
-  priceInCents           Int
+  priceInPiasters        Int
   filePath               String
   imagePath              String
   description            String
   isAvailableForPurchase Boolean                @default(true)
   createdAt              DateTime               @default(now())
   updatedAt              DateTime               @updatedAt
+  category               String                 @default("coffee") // coffee, tea, food, merchandise
+  featured               Boolean                @default(false)
+  calories               Int?
+  stockQuantity          Int                    @default(0)
   orders                 Order[]
   downloadVerifications  DownloadVerification[]
 }
@@ -33,10 +37,18 @@ model User {
 }
 
 model Order {
-  id               String   @id @default(uuid())
-  pricePaidInCents Int
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id                  String   @id @default(uuid())
+  pricePaidInPiasters Int
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Customer Information
+  customerName        String   @default("Guest")
+  phoneNumber         String   @default("")
+  address             String   @default("")
+  city                String   @default("")
+  postalCode          String?
+  notes               String?
 
   userId    String
   productId String

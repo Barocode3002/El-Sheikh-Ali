@@ -14,7 +14,7 @@ import React from "react"
 type OrderHistoryEmailProps = {
   orders: {
     id: string
-    pricePaidInCents: number
+    pricePaidInPiasters: number
     createdAt: Date
     downloadVerificationId: string
     product: {
@@ -30,7 +30,7 @@ OrderHistoryEmail.PreviewProps = {
     {
       id: crypto.randomUUID(),
       createdAt: new Date(),
-      pricePaidInCents: 10000,
+      pricePaidInPiasters: 10000,
       downloadVerificationId: crypto.randomUUID(),
       product: {
         name: "Product name",
@@ -42,7 +42,7 @@ OrderHistoryEmail.PreviewProps = {
     {
       id: crypto.randomUUID(),
       createdAt: new Date(),
-      pricePaidInCents: 2000,
+      pricePaidInPiasters: 2000,
       downloadVerificationId: crypto.randomUUID(),
       product: {
         name: "Product name 2",
