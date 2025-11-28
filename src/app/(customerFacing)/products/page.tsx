@@ -1,15 +1,17 @@
 import { ProductCard, ProductCardSkeleton } from "@/components/ProductCard"
-import db from "@/db/db"
-import { cache } from "@/lib/cache"
+// Temporarily disabled until Vercel Postgres is set up
+// import db from "@/db/db"
+// import { cache } from "@/lib/cache"
 import { ShoppingBag } from "lucide-react"
 import { Suspense } from "react"
 
-const getProducts = cache(() => {
-  return db.product.findMany({
-    where: { isAvailableForPurchase: true },
-    orderBy: { name: "asc" },
-  })
-}, ["/products", "getProducts"])
+// Temporarily disabled until Vercel Postgres is set up
+// const getProducts = cache(() => {
+//   return db.product.findMany({
+//     where: { isAvailableForPurchase: true },
+//     orderBy: { name: "asc" },
+//   })
+// }, ["/products", "getProducts"])
 
 export default function ProductsPage() {
   return (
@@ -28,6 +30,19 @@ export default function ProductsPage() {
       </div>
 
       <div className="container mx-auto px-4 py-16">
+        <div className="text-center py-20 bg-secondary/30 rounded-lg max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold mb-4">Online Ordering Coming Soon</h2>
+          <p className="text-xl text-muted-foreground mb-6">
+            We're currently setting up our online ordering system. Please check back soon or call us to place an order!
+          </p>
+          <p className="text-sm text-muted-foreground">
+            📍 123 Coffee Street, Your City | ☎️ +20 1211162791
+          </p>
+        </div>
+      </div>
+
+      {/* Temporarily disabled until Vercel Postgres is set up */}
+      {/* <div className="container mx-auto px-4 py-16">
         <Suspense
           fallback={
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -42,27 +57,28 @@ export default function ProductsPage() {
         >
           <ProductsSuspense />
         </Suspense>
-      </div>
+      </div> */}
     </main>
   )
 }
 
-async function ProductsSuspense() {
-  const products = await getProducts()
+// Temporarily disabled until Vercel Postgres is set up
+// async function ProductsSuspense() {
+//   const products = await getProducts()
 
-  if (products.length === 0) {
-    return (
-      <div className="text-center py-20">
-        <p className="text-xl text-muted-foreground">
-          No products available at the moment. Check back soon!
-        </p>
-      </div>
-    )
-  }
+//   if (products.length === 0) {
+//     return (
+//       <div className="text-center py-20">
+//         <p className="text-xl text-muted-foreground">
+//           No products available at the moment. Check back soon!
+//         </p>
+//       </div>
+//     )
+//   }
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {products.map(product => <ProductCard key={product.id} {...product} />)}
-    </div>
-  )
-}
+//   return (
+//     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//       {products.map(product => <ProductCard key={product.id} {...product} />)}
+//     </div>
+//   )
+// }

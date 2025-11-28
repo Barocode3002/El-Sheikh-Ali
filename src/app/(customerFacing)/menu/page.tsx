@@ -1,18 +1,20 @@
 import { ProductCard, ProductCardSkeleton } from "@/components/ProductCard"
-import db from "@/db/db"
-import { cache } from "@/lib/cache"
+// Temporarily disabled until Vercel Postgres is set up
+// import db from "@/db/db"
+// import { cache } from "@/lib/cache"
 import { Coffee, Croissant, Gift, Leaf } from "lucide-react"
 import { Suspense } from "react"
 
-const getProductsByCategory = cache((category: string) => {
-  return db.product.findMany({
-    where: { 
-      isAvailableForPurchase: true,
-      category: category
-    },
-    orderBy: { name: "asc" },
-  })
-}, ["/menu", "getProductsByCategory"])
+// Temporarily disabled until Vercel Postgres is set up
+// const getProductsByCategory = cache((category: string) => {
+//   return db.product.findMany({
+//     where: { 
+//       isAvailableForPurchase: true,
+//       category: category
+//     },
+//     orderBy: { name: "asc" },
+//   })
+// }, ["/menu", "getProductsByCategory"])
 
 export default function MenuPage() {
   return (
@@ -27,8 +29,20 @@ export default function MenuPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16 space-y-20">
-        {/* Coffee Section */}
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center py-12 bg-secondary/30 rounded-lg max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold mb-4">Menu Coming Soon</h2>
+          <p className="text-muted-foreground text-lg mb-6">
+            We're currently setting up our online menu. Please check back soon or visit us in person to see our full selection!
+          </p>
+          <p className="text-sm text-muted-foreground">
+            📍 123 Coffee Street, Your City | ☎️ +20 1211162791
+          </p>
+        </div>
+      </div>
+
+      {/* Temporarily disabled until Vercel Postgres is set up */}
+      {/* <div className="container mx-auto px-4 py-16 space-y-20">
         <MenuSection
           title="Coffee & Espresso"
           description="Handcrafted beverages made with premium beans"
@@ -36,7 +50,6 @@ export default function MenuPage() {
           category="coffee"
         />
 
-        {/* Tea Section */}
         <MenuSection
           title="Tea & More"
           description="Refreshing teas and specialty drinks"
@@ -44,7 +57,6 @@ export default function MenuPage() {
           category="tea"
         />
 
-        {/* Food Section */}
         <MenuSection
           title="Food & Treats"
           description="Delicious pastries and snacks"
@@ -52,69 +64,68 @@ export default function MenuPage() {
           category="food"
         />
 
-        {/* Merchandise Section */}
         <MenuSection
           title="Merchandise"
           description="Take El Sheikh Ali home with you"
           icon={<Gift className="w-10 h-10" />}
           category="merchandise"
         />
-      </div>
+      </div> */}
     </main>
   )
 }
 
-type MenuSectionProps = {
-  title: string
-  description: string
-  icon: React.ReactNode
-  category: string
-}
+// Temporarily disabled until Vercel Postgres is set up
+// type MenuSectionProps = {
+//   title: string
+//   description: string
+//   icon: React.ReactNode
+//   category: string
+// }
 
-function MenuSection({ title, description, icon, category }: MenuSectionProps) {
-  return (
-    <section className="space-y-6">
-      <div className="flex items-start gap-4 pb-4 border-b-2 border-accent/30">
-        <div className="text-coffee-medium mt-1">{icon}</div>
-        <div>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">{title}</h2>
-          <p className="text-muted-foreground text-lg">{description}</p>
-        </div>
-      </div>
-      <Suspense
-        fallback={
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <ProductCardSkeleton />
-            <ProductCardSkeleton />
-            <ProductCardSkeleton />
-          </div>
-        }
-      >
-        <ProductGrid category={category} />
-      </Suspense>
-    </section>
-  )
-}
+// function MenuSection({ title, description, icon, category }: MenuSectionProps) {
+//   return (
+//     <section className="space-y-6">
+//       <div className="flex items-start gap-4 pb-4 border-b-2 border-accent/30">
+//         <div className="text-coffee-medium mt-1">{icon}</div>
+//         <div>
+//           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">{title}</h2>
+//           <p className="text-muted-foreground text-lg">{description}</p>
+//         </div>
+//       </div>
+//       <Suspense
+//         fallback={
+//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//             <ProductCardSkeleton />
+//             <ProductCardSkeleton />
+//             <ProductCardSkeleton />
+//           </div>
+//         }
+//       >
+//         <ProductGrid category={category} />
+//       </Suspense>
+//     </section>
+//   )
+// }
 
-async function ProductGrid({ category }: { category: string }) {
-  const products = await getProductsByCategory(category)
+// async function ProductGrid({ category }: { category: string }) {
+//   const products = await getProductsByCategory(category)
   
-  if (products.length === 0) {
-    return (
-      <div className="text-center py-12 bg-secondary/30 rounded-lg">
-        <p className="text-muted-foreground text-lg">
-          No items available in this category yet. Check back soon!
-        </p>
-      </div>
-    )
-  }
+//   if (products.length === 0) {
+//     return (
+//       <div className="text-center py-12 bg-secondary/30 rounded-lg">
+//         <p className="text-muted-foreground text-lg">
+//           No items available in this category yet. Check back soon!
+//         </p>
+//       </div>
+//     )
+//   }
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {products.map(product => (
-        <ProductCard key={product.id} {...product} />
-      ))}
-    </div>
-  )
-}
-
+//   return (
+//     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//       {products.map(product => (
+//         <ProductCard key={product.id} {...product} />
+//       ))}
+//     </div>
+//   )
+// }
