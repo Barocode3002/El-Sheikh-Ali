@@ -19,7 +19,6 @@ export function Nav({ children }: { children: ReactNode }) {
               width={42}
               height={42}
               className="w-8 h-8 rounded-md"
-              priority
             />
             <span className="text-xl font-bold hidden sm:inline">El Sheikh Ali</span>
           </Link>
@@ -34,16 +33,12 @@ export function Nav({ children }: { children: ReactNode }) {
 
 export function NavLink(props: Omit<ComponentProps<typeof Link>, "className">) {
   const pathname = usePathname()
-  
-  // Handle the case where pathname might be undefined during SSR
-  const isActive = pathname ? pathname === props.href : false
-  
   return (
     <Link
       {...props}
       className={cn(
         "px-4 py-6 hover:bg-accent/20 hover:text-accent focus-visible:bg-accent/20 focus-visible:text-accent transition-all duration-200 font-medium border-b-2 border-transparent",
-        isActive && "border-accent text-accent"
+        pathname === props.href && "border-accent text-accent"
       )}
     />
   )

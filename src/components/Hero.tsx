@@ -33,7 +33,7 @@ export function Hero() {
           </p>
 
           <p className="text-base md:text-lg text-cream/90 max-w-2xl mx-auto leading-relaxed">
-            Experience the finest handcrafted coffee, made with passion and served with care. 
+            Experience the finest handcrafted coffee for 70+ years, made with passion and served with care. 
             From our signature espresso to artisanal treats, every moment at El Sheikh Ali is special.
           </p>
 
@@ -50,7 +50,7 @@ export function Hero() {
               asChild 
               size="lg" 
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white hover:text-espresso font-semibold px-8 py-6 text-lg rounded-full shadow-xl transition-all duration-300 hover:scale-105"
+              className="border-2 border-white text-coffee-dark hover:bg-white hover:text-espresso font-semibold px-8 py-6 text-lg rounded-full shadow-xl transition-all duration-300 hover:scale-105"
             >
               <Link href="/menu">View Menu</Link>
             </Button>
